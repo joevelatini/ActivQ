@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Productivity Health Scorer</title>
+    <title>ActivQ</title>
     <style>
         * {
             box-sizing: border-box;
@@ -12,7 +12,7 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Century Gothic', CenturyGothic, AppleGothic, sans-serif;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
             padding: 20px;
@@ -27,7 +27,7 @@
         h1 {
             text-align: center;
             margin-bottom: 8px;
-            font-size: 1.8rem;
+            font-size: 2.2rem;
             background: linear-gradient(90deg, #00d4ff, #7b2cbf);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -83,6 +83,54 @@
             box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
         }
         
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 14px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            margin-left: 10px;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Results Page Styles */
+        .results-page {
+            display: none;
+        }
+        
+        .results-page.active {
+            display: block;
+        }
+        
+        .input-page.hidden {
+            display: none;
+        }
+        
         .results-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -117,7 +165,7 @@
         }
         
         .result-label {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: #aaa;
         }
         
@@ -136,13 +184,13 @@
         }
         
         .total-label {
-            font-size: 1rem;
+            font-size: 1.2rem;
             color: #aaa;
             margin-bottom: 10px;
         }
         
         .total-score {
-            font-size: 4rem;
+            font-size: 5rem;
             font-weight: 800;
             background: linear-gradient(90deg, #00d4ff, #7b2cbf);
             -webkit-background-clip: text;
@@ -182,137 +230,134 @@
             background: rgba(255, 50, 99, 0.2);
             color: #ff3263;
         }
-        
-        .formula {
-            font-size: 0.7rem;
-            color: #666;
-            margin-top: 4px;
+
+        @media print {
+            body {
+                background: #1a1a2e;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .btn-container {
+                display: none;
+            }
+            
+            .card, .total-section, .result-item {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Productivity Health Scorer</h1>
-        <p class="subtitle">Enter your metrics below to calculate your overall health score</p>
-        
-        <div class="card">
-            <div class="input-grid">
-                <div class="input-group">
-                    <label>Users</label>
-                    <input type="number" id="users" placeholder="Enter number of users" oninput="calculate()">
+        <!-- Input Page -->
+        <div class="input-page" id="inputPage">
+            <h1>ActivQ</h1>
+            <p class="subtitle">Enter your metrics below to calculate your overall health score</p>
+            
+            <div class="card">
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Users</label>
+                        <input type="number" id="users" placeholder="Enter number of users">
+                    </div>
+                    <div class="input-group">
+                        <label>Instances of Potential False Activity</label>
+                        <input type="number" id="falseActivity" placeholder="Total instances">
+                    </div>
+                    <div class="input-group">
+                        <label>Instances of High Duration Activity</label>
+                        <input type="number" id="highDuration" placeholder="Total instances">
+                    </div>
+                    <div class="input-group">
+                        <label>Unproductive Website Time</label>
+                        <input type="number" step="0.01" id="unprodWebsite" placeholder="Total time">
+                    </div>
+                    <div class="input-group">
+                        <label>Unproductive Application Time</label>
+                        <input type="number" step="0.01" id="unprodApp" placeholder="Total time">
+                    </div>
+                    <div class="input-group">
+                        <label>Missing Productivity Goal (%)</label>
+                        <input type="number" step="0.1" id="missingGoal" placeholder="Percentage">
+                    </div>
+                    <div class="input-group">
+                        <label>Healthy %</label>
+                        <input type="number" step="0.1" id="healthy" placeholder="Percentage">
+                    </div>
+                    <div class="input-group">
+                        <label>Overutilized %</label>
+                        <input type="number" step="0.1" id="overutilized" placeholder="Percentage">
+                    </div>
+                    <div class="input-group">
+                        <label>Underutilized %</label>
+                        <input type="number" step="0.1" id="underutilized" placeholder="Percentage">
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label>Instances of Potential False Activity</label>
-                    <input type="number" id="falseActivity" placeholder="Total instances" oninput="calculate()">
-                    <span class="formula">÷ Users = Per User Rate</span>
-                </div>
-                <div class="input-group">
-                    <label>Instances of High Duration Activity</label>
-                    <input type="number" id="highDuration" placeholder="Total instances" oninput="calculate()">
-                    <span class="formula">÷ Users = Per User Rate</span>
-                </div>
-                <div class="input-group">
-                    <label>Unproductive Website Time</label>
-                    <input type="number" step="0.01" id="unprodWebsite" placeholder="Total time" oninput="calculate()">
-                    <span class="formula">÷ Users = Per User Rate</span>
-                </div>
-                <div class="input-group">
-                    <label>Unproductive Application Time</label>
-                    <input type="number" step="0.01" id="unprodApp" placeholder="Total time" oninput="calculate()">
-                    <span class="formula">÷ Users = Per User Rate</span>
-                </div>
-                <div class="input-group">
-                    <label>% Missing Productivity Goal</label>
-                    <input type="number" step="0.1" id="missingGoal" placeholder="Percentage" oninput="calculate()">
-                    <span class="formula">Used as-is</span>
-                </div>
-                <div class="input-group">
-                    <label>Healthy %</label>
-                    <input type="number" step="0.1" id="healthy" placeholder="Percentage" oninput="calculate()">
-                    <span class="formula">Value - 70 = Adjusted</span>
-                </div>
-                <div class="input-group">
-                    <label>Overutilized %</label>
-                    <input type="number" step="0.1" id="overutilized" placeholder="Percentage" oninput="calculate()">
-                    <span class="formula">8 - Value = Adjusted</span>
-                </div>
-                <div class="input-group">
-                    <label>Underutilized %</label>
-                    <input type="number" step="0.1" id="underutilized" placeholder="Percentage" oninput="calculate()">
-                    <span class="formula">22 - Value = Adjusted</span>
-                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn btn-primary" onclick="calculate()">Calculate</button>
             </div>
         </div>
         
-        <div class="card">
-            <h3 style="margin-bottom: 16px; color: #aaa; font-size: 0.9rem;">Individual Scores (out of 14 each, except Healthy/Over/Underutilized out of 10)</h3>
-            <div class="results-grid">
-                <div class="result-item" id="res-false">
-                    <div>
+        <!-- Results Page -->
+        <div class="results-page" id="resultsPage">
+            <h1>ActivQ</h1>
+            <p class="subtitle">Health Score Results</p>
+            
+            <div class="card">
+                <h3 style="margin-bottom: 16px; color: #aaa; font-size: 0.9rem;">Individual Scores</h3>
+                <div class="results-grid">
+                    <div class="result-item" id="res-false">
                         <div class="result-label">False Activity</div>
-                        <div class="formula" id="calc-false">--</div>
+                        <div class="result-score" id="score-false">--</div>
                     </div>
-                    <div class="result-score" id="score-false">--</div>
-                </div>
-                <div class="result-item" id="res-high">
-                    <div>
+                    <div class="result-item" id="res-high">
                         <div class="result-label">High Duration</div>
-                        <div class="formula" id="calc-high">--</div>
+                        <div class="result-score" id="score-high">--</div>
                     </div>
-                    <div class="result-score" id="score-high">--</div>
-                </div>
-                <div class="result-item" id="res-web">
-                    <div>
+                    <div class="result-item" id="res-web">
                         <div class="result-label">Unprod. Website</div>
-                        <div class="formula" id="calc-web">--</div>
+                        <div class="result-score" id="score-web">--</div>
                     </div>
-                    <div class="result-score" id="score-web">--</div>
-                </div>
-                <div class="result-item" id="res-app">
-                    <div>
+                    <div class="result-item" id="res-app">
                         <div class="result-label">Unprod. App</div>
-                        <div class="formula" id="calc-app">--</div>
+                        <div class="result-score" id="score-app">--</div>
                     </div>
-                    <div class="result-score" id="score-app">--</div>
-                </div>
-                <div class="result-item" id="res-missing">
-                    <div>
+                    <div class="result-item" id="res-missing">
                         <div class="result-label">Missing Goal %</div>
-                        <div class="formula" id="calc-missing">--</div>
+                        <div class="result-score" id="score-missing">--</div>
                     </div>
-                    <div class="result-score" id="score-missing">--</div>
-                </div>
-                <div class="result-item" id="res-healthy">
-                    <div>
+                    <div class="result-item" id="res-healthy">
                         <div class="result-label">Healthy %</div>
-                        <div class="formula" id="calc-healthy">--</div>
+                        <div class="result-score" id="score-healthy">--</div>
                     </div>
-                    <div class="result-score" id="score-healthy">--</div>
-                </div>
-                <div class="result-item" id="res-over">
-                    <div>
+                    <div class="result-item" id="res-over">
                         <div class="result-label">Overutilized %</div>
-                        <div class="formula" id="calc-over">--</div>
+                        <div class="result-score" id="score-over">--</div>
                     </div>
-                    <div class="result-score" id="score-over">--</div>
-                </div>
-                <div class="result-item" id="res-under">
-                    <div>
+                    <div class="result-item" id="res-under">
                         <div class="result-label">Underutilized %</div>
-                        <div class="formula" id="calc-under">--</div>
+                        <div class="result-score" id="score-under">--</div>
                     </div>
-                    <div class="result-score" id="score-under">--</div>
                 </div>
             </div>
-        </div>
-        
-        <div class="total-section">
-            <div class="total-label">Total Health Score</div>
-            <div>
-                <span class="total-score" id="total">0</span>
-                <span class="total-max"> / 100</span>
+            
+            <div class="total-section">
+                <div class="total-label">ActivQ</div>
+                <div>
+                    <span class="total-score" id="total">0</span>
+                    <span class="total-max"> / 100</span>
+                </div>
+                <div class="grade" id="grade">--</div>
             </div>
-            <div class="grade" id="grade">Enter data above</div>
+            
+            <div class="btn-container">
+                <button class="btn btn-secondary" onclick="goBack()">Back</button>
+                <button class="btn btn-primary" onclick="window.print()">Save as PDF</button>
+            </div>
         </div>
     </div>
 
@@ -426,15 +471,6 @@
             let s7 = getScore(ovAdj, rangesOver, true);
             let s8 = getScoreUnder(unAdj, rangesUnder);
 
-            document.getElementById('calc-false').textContent = `${fa} ÷ ${users} = ${faRate.toFixed(2)}`;
-            document.getElementById('calc-high').textContent = `${hd} ÷ ${users} = ${hdRate.toFixed(2)}`;
-            document.getElementById('calc-web').textContent = `${uw} ÷ ${users} = ${uwRate.toFixed(2)}`;
-            document.getElementById('calc-app').textContent = `${ua} ÷ ${users} = ${uaRate.toFixed(2)}`;
-            document.getElementById('calc-missing').textContent = `${mg}%`;
-            document.getElementById('calc-healthy').textContent = `${hy} - 70 = ${hyAdj.toFixed(1)}`;
-            document.getElementById('calc-over').textContent = `8 - ${ov} = ${ovAdj.toFixed(1)}`;
-            document.getElementById('calc-under').textContent = `22 - ${un} = ${unAdj.toFixed(1)}`;
-
             document.getElementById('score-false').textContent = s1;
             document.getElementById('score-high').textContent = s2;
             document.getElementById('score-web').textContent = s3;
@@ -485,6 +521,15 @@
                 totalEl.style.color = '#ff3263';
                 totalEl.style.webkitTextFillColor = '#ff3263';
             }
+            
+            // Show results page, hide input page
+            document.getElementById('inputPage').classList.add('hidden');
+            document.getElementById('resultsPage').classList.add('active');
+        }
+
+        function goBack() {
+            document.getElementById('inputPage').classList.remove('hidden');
+            document.getElementById('resultsPage').classList.remove('active');
         }
     </script>
 </body>
