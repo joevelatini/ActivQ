@@ -119,7 +119,6 @@
             background: rgba(255, 255, 255, 0.2);
         }
         
-        /* Results Page Styles */
         .results-page {
             display: none;
         }
@@ -158,6 +157,7 @@
         .result-item input[type="checkbox"] {
             width: 18px;
             height: 18px;
+            min-width: 18px;
             cursor: pointer;
             accent-color: #00d4ff;
         }
@@ -312,7 +312,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Input Page -->
         <div class="input-page" id="inputPage">
             <h1>ActivQ</h1>
             <p class="subtitle">Enter your metrics below to calculate your overall health score</p>
@@ -363,7 +362,6 @@
             </div>
         </div>
         
-        <!-- Results Page -->
         <div class="results-page" id="resultsPage">
             <h1>ActivQ</h1>
             <p class="subtitle">Health Score Results</p>
@@ -372,35 +370,59 @@
                 <h3 style="margin-bottom: 16px; color: #aaa; font-size: 0.9rem;">Individual Scores</h3>
                 <div class="results-grid">
                     <div class="result-item" id="res-false">
-                        <div class="result-label">False Activity</div>
+                        <div class="left-section">
+                            <input type="checkbox" id="check-false" onchange="updateImprovements()">
+                            <div class="result-label">False Activity</div>
+                        </div>
                         <div class="result-score" id="score-false">--</div>
                     </div>
                     <div class="result-item" id="res-high">
-                        <div class="result-label">High Duration</div>
+                        <div class="left-section">
+                            <input type="checkbox" id="check-high" onchange="updateImprovements()">
+                            <div class="result-label">High Duration</div>
+                        </div>
                         <div class="result-score" id="score-high">--</div>
                     </div>
                     <div class="result-item" id="res-web">
-                        <div class="result-label">Unprod. Website</div>
+                        <div class="left-section">
+                            <input type="checkbox" id="check-web" onchange="updateImprovements()">
+                            <div class="result-label">Unprod. Website</div>
+                        </div>
                         <div class="result-score" id="score-web">--</div>
                     </div>
                     <div class="result-item" id="res-app">
-                        <div class="result-label">Unprod. App</div>
+                        <div class="left-section">
+                            <input type="checkbox" id="check-app" onchange="updateImprovements()">
+                            <div class="result-label">Unprod. App</div>
+                        </div>
                         <div class="result-score" id="score-app">--</div>
                     </div>
                     <div class="result-item" id="res-missing">
-                        <div class="result-label">Missing Goal %</div>
+                        <div class="left-section">
+                            <input type="checkbox" id="check-missing" onchange="updateImprovements()">
+                            <div class="result-label">Missing Goal %</div>
+                        </div>
                         <div class="result-score" id="score-missing">--</div>
                     </div>
                     <div class="result-item" id="res-healthy">
-                        <div class="result-label">Healthy %</div>
+                        <div class="left-section">
+                            <input type="checkbox" id="check-healthy" onchange="updateImprovements()">
+                            <div class="result-label">Healthy %</div>
+                        </div>
                         <div class="result-score" id="score-healthy">--</div>
                     </div>
                     <div class="result-item" id="res-over">
-                        <div class="result-label">Overutilized %</div>
+                        <div class="left-section">
+                            <input type="checkbox" id="check-over" onchange="updateImprovements()">
+                            <div class="result-label">Overutilized %</div>
+                        </div>
                         <div class="result-score" id="score-over">--</div>
                     </div>
                     <div class="result-item" id="res-under">
-                        <div class="result-label">Underutilized %</div>
+                        <div class="left-section">
+                            <input type="checkbox" id="check-under" onchange="updateImprovements()">
+                            <div class="result-label">Underutilized %</div>
+                        </div>
                         <div class="result-score" id="score-under">--</div>
                     </div>
                 </div>
@@ -483,6 +505,41 @@
             { max: -Infinity, score: 1 }
         ];
 
+        const improvementTexts = {
+            'false': {
+                title: 'Potential False Activity',
+                text: 'Potential False Activity refers to work patterns that may indicate the use of productivity-mimicking technology, such as mouse jigglers, which create false signals of activity. This behavior is detected to ensure workforce data reflects genuine productivity, helping maintain data integrity and accurate metrics.'
+            },
+            'high': {
+                title: 'High Duration Activity',
+                text: 'High Duration Activity flags when someone spends more than 45 minutes on a single screen. Since it\'s rare for employees to work on the same screen for that long without switching tabs or going passive, this usually indicates that someone is using software or a device to mimic activity.'
+            },
+            'web': {
+                title: 'Unproductive Website Time',
+                text: 'Unproductive Website Time shows how much time users have spent on websites classified as unproductive.'
+            },
+            'app': {
+                title: 'Unproductive Application Time',
+                text: 'Unproductive Application Time shows how much time users have spent using applications classified as unproductive.'
+            },
+            'missing': {
+                title: 'Missing Productivity Goal (%)',
+                text: 'Missing Productivity Goal (%) provides the percentage of active team members working below their productivity hrs/day goal'
+            },
+            'healthy': {
+                title: 'Healthy %',
+                text: 'A team is considered to have a healthy workload when at least 70% of its members are within 20% of their Productive Hours per Day goal'
+            },
+            'over': {
+                title: 'Overutilized %',
+                text: 'A team is considered overutilized when at least 8% of its members are exceeding their Productive Hours per Day goal by 20% or more.'
+            },
+            'under': {
+                title: 'Underutilized %',
+                text: 'A team is considered underutilized when at least 22% of its members are missing their Productive Hours per Day goal by 20% or more.'
+            }
+        };
+
         function getScore(val, ranges, useMin = false) {
             if (useMin) {
                 for (let r of ranges) {
@@ -511,6 +568,24 @@
             return 'poor';
         }
 
+        function updateImprovements() {
+            const checkboxes = ['false', 'high', 'web', 'app', 'missing', 'healthy', 'over', 'under'];
+            const container = document.getElementById('improvementsContent');
+            let html = '';
+            
+            checkboxes.forEach(id => {
+                if (document.getElementById('check-' + id).checked) {
+                    html += '<div class="improvement-item"><h4>' + improvementTexts[id].title + '</h4><p>' + improvementTexts[id].text + '</p></div>';
+                }
+            });
+            
+            if (html === '') {
+                html = '<div class="no-improvements">Select checkboxes above to identify areas for improvement</div>';
+            }
+            
+            container.innerHTML = html;
+        }
+
         function calculate() {
             let users = parseFloat(document.getElementById('users').value) || 0;
             let fa = parseFloat(document.getElementById('falseActivity').value) || 0;
@@ -522,7 +597,6 @@
             let ov = parseFloat(document.getElementById('overutilized').value) || 0;
             let un = parseFloat(document.getElementById('underutilized').value) || 0;
 
-            // Check if all fields are blank
             let allBlank = !document.getElementById('users').value &&
                            !document.getElementById('falseActivity').value &&
                            !document.getElementById('highDuration').value &&
@@ -565,12 +639,12 @@
             document.getElementById('score-over').textContent = s7;
             document.getElementById('score-under').textContent = s8;
 
-            ['false', 'high', 'web', 'app', 'missing'].forEach((id, i) => {
+            ['false', 'high', 'web', 'app', 'missing'].forEach(function(id, i) {
                 let s = [s1, s2, s3, s4, s5][i];
                 document.getElementById('res-' + id).className = 'result-item ' + getClass(s, 14);
             });
             
-            ['healthy', 'over', 'under'].forEach((id, i) => {
+            ['healthy', 'over', 'under'].forEach(function(id, i) {
                 let s = [s6, s7, s8][i];
                 document.getElementById('res-' + id).className = 'result-item ' + getClass(s, 10);
             });
@@ -607,7 +681,12 @@
                 totalEl.style.webkitTextFillColor = '#ff3263';
             }
             
-            // Show results page, hide input page
+            // Reset checkboxes and improvements
+            ['false', 'high', 'web', 'app', 'missing', 'healthy', 'over', 'under'].forEach(function(id) {
+                document.getElementById('check-' + id).checked = false;
+            });
+            updateImprovements();
+            
             document.getElementById('inputPage').classList.add('hidden');
             document.getElementById('resultsPage').classList.add('active');
         }
@@ -615,62 +694,6 @@
         function goBack() {
             document.getElementById('inputPage').classList.remove('hidden');
             document.getElementById('resultsPage').classList.remove('active');
-        }
-
-        const improvementTexts = {
-            'false': {
-                title: 'Potential False Activity',
-                text: 'Potential False Activity refers to work patterns that may indicate the use of productivity-mimicking technology, such as mouse jigglers, which create false signals of activity. This behavior is detected to ensure workforce data reflects genuine productivity, helping maintain data integrity and accurate metrics.'
-            },
-            'high': {
-                title: 'High Duration Activity',
-                text: 'High Duration Activity flags when someone spends more than 45 minutes on a single screen. Since it\'s rare for employees to work on the same screen for that long without switching tabs or going passive, this usually indicates that someone is using software or a device to mimic activity.'
-            },
-            'web': {
-                title: 'Unproductive Website Time',
-                text: 'Unproductive Website Time shows how much time users have spent on websites classified as unproductive.'
-            },
-            'app': {
-                title: 'Unproductive Application Time',
-                text: 'Unproductive Application Time shows how much time users have spent using applications classified as unproductive.'
-            },
-            'missing': {
-                title: 'Missing Productivity Goal (%)',
-                text: 'Missing Productivity Goal (%) provides the percentage of active team members working below their productivity hrs/day goal'
-            },
-            'healthy': {
-                title: 'Healthy %',
-                text: 'A team is considered to have a healthy workload when at least 70% of its members are within 20% of their Productive Hours per Day goal'
-            },
-            'over': {
-                title: 'Overutilized %',
-                text: 'A team is considered overutilized when at least 8% of its members are exceeding their Productive Hours per Day goal by 20% or more.'
-            },
-            'under': {
-                title: 'Underutilized %',
-                text: 'A team is considered underutilized when at least 22% of its members are missing their Productive Hours per Day goal by 20% or more.'
-            }
-        };
-
-        function updateImprovements() {
-            const checkboxes = ['false', 'high', 'web', 'app', 'missing', 'healthy', 'over', 'under'];
-            const container = document.getElementById('improvementsContent');
-            let html = '';
-            
-            checkboxes.forEach(id => {
-                if (document.getElementById('check-' + id).checked) {
-                    html += `<div class="improvement-item">
-                        <h4>${improvementTexts[id].title}</h4>
-                        <p>${improvementTexts[id].text}</p>
-                    </div>`;
-                }
-            });
-            
-            if (html === '') {
-                html = '<div class="no-improvements">Select checkboxes above to identify areas for improvement</div>';
-            }
-            
-            container.innerHTML = html;
         }
 
         function downloadPDF() {
@@ -686,7 +709,7 @@
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
             
-            html2pdf().set(opt).from(element).save().then(() => {
+            html2pdf().set(opt).from(element).save().then(function() {
                 buttons.style.display = 'block';
             });
         }
