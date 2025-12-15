@@ -149,6 +149,19 @@
             border-left: 4px solid #444;
         }
         
+        .result-item .left-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .result-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #00d4ff;
+        }
+        
         .result-item.excellent {
             border-left-color: #2ED4B5;
         }
@@ -231,6 +244,52 @@
         .grade.poor {
             background: rgba(255, 50, 99, 0.2);
             color: #ff3263;
+        }
+        
+        .improvements-section {
+            margin-top: 20px;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .improvements-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #aaa;
+            margin-bottom: 16px;
+        }
+        
+        .improvement-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+            border-left: 4px solid #00d4ff;
+        }
+        
+        .improvement-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .improvement-item h4 {
+            color: #00d4ff;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+        
+        .improvement-item p {
+            color: #ccc;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        .no-improvements {
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
         }
 
         @media print {
@@ -354,6 +413,13 @@
                     <span class="total-max"> / 100</span>
                 </div>
                 <div class="grade" id="grade">--</div>
+            </div>
+            
+            <div class="improvements-section">
+                <div class="improvements-title">Main Areas for Improvement</div>
+                <div id="improvementsContent">
+                    <div class="no-improvements">Select checkboxes above to identify areas for improvement</div>
+                </div>
             </div>
             
             <div class="btn-container">
@@ -549,6 +615,62 @@
         function goBack() {
             document.getElementById('inputPage').classList.remove('hidden');
             document.getElementById('resultsPage').classList.remove('active');
+        }
+
+        const improvementTexts = {
+            'false': {
+                title: 'Potential False Activity',
+                text: 'Potential False Activity refers to work patterns that may indicate the use of productivity-mimicking technology, such as mouse jigglers, which create false signals of activity. This behavior is detected to ensure workforce data reflects genuine productivity, helping maintain data integrity and accurate metrics.'
+            },
+            'high': {
+                title: 'High Duration Activity',
+                text: 'High Duration Activity flags when someone spends more than 45 minutes on a single screen. Since it\'s rare for employees to work on the same screen for that long without switching tabs or going passive, this usually indicates that someone is using software or a device to mimic activity.'
+            },
+            'web': {
+                title: 'Unproductive Website Time',
+                text: 'Unproductive Website Time shows how much time users have spent on websites classified as unproductive.'
+            },
+            'app': {
+                title: 'Unproductive Application Time',
+                text: 'Unproductive Application Time shows how much time users have spent using applications classified as unproductive.'
+            },
+            'missing': {
+                title: 'Missing Productivity Goal (%)',
+                text: 'Missing Productivity Goal (%) provides the percentage of active team members working below their productivity hrs/day goal'
+            },
+            'healthy': {
+                title: 'Healthy %',
+                text: 'A team is considered to have a healthy workload when at least 70% of its members are within 20% of their Productive Hours per Day goal'
+            },
+            'over': {
+                title: 'Overutilized %',
+                text: 'A team is considered overutilized when at least 8% of its members are exceeding their Productive Hours per Day goal by 20% or more.'
+            },
+            'under': {
+                title: 'Underutilized %',
+                text: 'A team is considered underutilized when at least 22% of its members are missing their Productive Hours per Day goal by 20% or more.'
+            }
+        };
+
+        function updateImprovements() {
+            const checkboxes = ['false', 'high', 'web', 'app', 'missing', 'healthy', 'over', 'under'];
+            const container = document.getElementById('improvementsContent');
+            let html = '';
+            
+            checkboxes.forEach(id => {
+                if (document.getElementById('check-' + id).checked) {
+                    html += `<div class="improvement-item">
+                        <h4>${improvementTexts[id].title}</h4>
+                        <p>${improvementTexts[id].text}</p>
+                    </div>`;
+                }
+            });
+            
+            if (html === '') {
+                html = '<div class="no-improvements">Select checkboxes above to identify areas for improvement</div>';
+            }
+            
+            container.innerHTML = html;
         }
 
         function downloadPDF() {
