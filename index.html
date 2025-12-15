@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productivity Health Scorer</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .input-group label {
+            font-size: 0.85rem;
+            color: #aaa;
+            font-weight: 500;
+        }
+        
+        .input-group input {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #444;
+        }
+        
+        .result-item.excellent {
+            border-left-color: #2ED4B5;
+        }
+        
+        .result-item.good {
+            border-left-color: #5BCF6D;
+        }
+        
+        .result-item.fair {
+            border-left-color: #FFC83B;
+        }
+        
+        .result-item.poor {
+            border-left-color: #ff3263;
+        }
+        
+        .result-label {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+        
+        .result-score {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        .total-section {
+            text-align: center;
+            margin-top: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(123, 44, 191, 0.1));
+            border-radius: 16px;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+        }
+        
+        .total-label {
+            font-size: 1rem;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+        
+        .total-score {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .total-max {
+            font-size: 1.5rem;
+            color: #666;
+        }
+        
+        .grade {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        .grade.excellent {
+            background: rgba(46, 212, 181, 0.2);
+            color: #2ED4B5;
+        }
+        
+        .grade.good {
+            background: rgba(91, 207, 109, 0.2);
+            color: #5BCF6D;
+        }
+        
+        .grade.fair {
+            background: rgba(255, 200, 59, 0.2);
+            color: #FFC83B;
+        }
+        
+        .grade.poor {
+            background: rgba(255, 50, 99, 0.2);
+            color: #ff3263;
+        }
+        
+        .formula {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Productivity Health Scorer</h1>
+        <p class="subtitle">Enter your metrics below to calculate your overall health score</p>
+        
+        <div class="card">
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>Users</label>
+                    <input type="number" id="users" placeholder="Enter number of users" oninput="calculate()">
+                </div>
+                <div class="input-group">
+                    <label>Instances of Potential False Activity</label>
+                    <input type="number" id="falseActivity" placeholder="Total instances" oninput="calculate()">
+                    <span class="formula">÷ Users = Per User Rate</span>
+                </div>
+                <div class="input-group">
+                    <label>Instances of High Duration Activity</label>
+                    <input type="number" id="highDuration" placeholder="Total instances" oninput="calculate()">
+                    <span class="formula">÷ Users = Per User Rate</span>
+                </div>
+                <div class="input-group">
+                    <label>Unproductive Website Time</label>
+                    <input type="number" step="0.01" id="unprodWebsite" placeholder="Total time" oninput="calculate()">
+                    <span class="formula">÷ Users = Per User Rate</span>
+                </div>
+                <div class="input-group">
+                    <label>Unproductive Application Time</label>
+                    <input type="number" step="0.01" id="unprodApp" placeholder="Total time" oninput="calculate()">
+                    <span class="formula">÷ Users = Per User Rate</span>
+                </div>
+                <div class="input-group">
+                    <label>% Missing Productivity Goal</label>
+                    <input type="number" step="0.1" id="missingGoal" placeholder="Percentage" oninput="calculate()">
+                    <span class="formula">Used as-is</span>
+                </div>
+                <div class="input-group">
+                    <label>Healthy %</label>
+                    <input type="number" step="0.1" id="healthy" placeholder="Percentage" oninput="calculate()">
+                    <span class="formula">Value - 70 = Adjusted</span>
+                </div>
+                <div class="input-group">
+                    <label>Overutilized %</label>
+                    <input type="number" step="0.1" id="overutilized" placeholder="Percentage" oninput="calculate()">
+                    <span class="formula">8 - Value = Adjusted</span>
+                </div>
+                <div class="input-group">
+                    <label>Underutilized %</label>
+                    <input type="number" step="0.1" id="underutilized" placeholder="Percentage" oninput="calculate()">
+                    <span class="formula">22 - Value = Adjusted</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3 style="margin-bottom: 16px; color: #aaa; font-size: 0.9rem;">Individual Scores (out of 14 each, except Healthy/Over/Underutilized out of 10)</h3>
+            <div class="results-grid">
+                <div class="result-item" id="res-false">
+                    <div>
+                        <div class="result-label">False Activity</div>
+                        <div class="formula" id="calc-false">--</div>
+                    </div>
+                    <div class="result-score" id="score-false">--</div>
+                </div>
+                <div class="result-item" id="res-high">
+                    <div>
+                        <div class="result-label">High Duration</div>
+                        <div class="formula" id="calc-high">--</div>
+                    </div>
+                    <div class="result-score" id="score-high">--</div>
+                </div>
+                <div class="result-item" id="res-web">
+                    <div>
+                        <div class="result-label">Unprod. Website</div>
+                        <div class="formula" id="calc-web">--</div>
+                    </div>
+                    <div class="result-score" id="score-web">--</div>
+                </div>
+                <div class="result-item" id="res-app">
+                    <div>
+                        <div class="result-label">Unprod. App</div>
+                        <div class="formula" id="calc-app">--</div>
+                    </div>
+                    <div class="result-score" id="score-app">--</div>
+                </div>
+                <div class="result-item" id="res-missing">
+                    <div>
+                        <div class="result-label">Missing Goal %</div>
+                        <div class="formula" id="calc-missing">--</div>
+                    </div>
+                    <div class="result-score" id="score-missing">--</div>
+                </div>
+                <div class="result-item" id="res-healthy">
+                    <div>
+                        <div class="result-label">Healthy %</div>
+                        <div class="formula" id="calc-healthy">--</div>
+                    </div>
+                    <div class="result-score" id="score-healthy">--</div>
+                </div>
+                <div class="result-item" id="res-over">
+                    <div>
+                        <div class="result-label">Overutilized %</div>
+                        <div class="formula" id="calc-over">--</div>
+                    </div>
+                    <div class="result-score" id="score-over">--</div>
+                </div>
+                <div class="result-item" id="res-under">
+                    <div>
+                        <div class="result-label">Underutilized %</div>
+                        <div class="formula" id="calc-under">--</div>
+                    </div>
+                    <div class="result-score" id="score-under">--</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="total-section">
+            <div class="total-label">Total Health Score</div>
+            <div>
+                <span class="total-score" id="total">0</span>
+                <span class="total-max"> / 100</span>
+            </div>
+            <div class="grade" id="grade">Enter data above</div>
+        </div>
+    </div>
+
+    <script>
+        const ranges14 = [
+            { max: 0.10, score: 14 }, { max: 0.20, score: 13 }, { max: 0.40, score: 12 },
+            { max: 0.55, score: 11 }, { max: 0.70, score: 10 }, { max: 0.85, score: 9 },
+            { max: 1.00, score: 8 }, { max: 1.15, score: 7 }, { max: 1.35, score: 6 },
+            { max: 1.55, score: 5 }, { max: 1.70, score: 4 }, { max: 1.85, score: 3 },
+            { max: 1.99, score: 2 }, { max: Infinity, score: 1 }
+        ];
+        
+        const rangesWeb = [
+            { max: 0.07, score: 14 }, { max: 0.14, score: 13 }, { max: 0.21, score: 12 },
+            { max: 0.28, score: 11 }, { max: 0.35, score: 10 }, { max: 0.42, score: 9 },
+            { max: 0.49, score: 8 }, { max: 0.56, score: 7 }, { max: 0.63, score: 6 },
+            { max: 0.70, score: 5 }, { max: 0.77, score: 4 }, { max: 0.84, score: 3 },
+            { max: 0.99, score: 2 }, { max: Infinity, score: 1 }
+        ];
+        
+        const rangesApp = [
+            { max: 0.03, score: 14 }, { max: 0.06, score: 13 }, { max: 0.09, score: 12 },
+            { max: 0.12, score: 11 }, { max: 0.15, score: 10 }, { max: 0.18, score: 9 },
+            { max: 0.21, score: 8 }, { max: 0.24, score: 7 }, { max: 0.27, score: 6 },
+            { max: 0.33, score: 5 }, { max: 0.38, score: 4 }, { max: 0.43, score: 3 },
+            { max: 0.49, score: 2 }, { max: Infinity, score: 1 }
+        ];
+        
+        const rangesMissing = [
+            { max: 3, score: 14 }, { max: 6, score: 13 }, { max: 10, score: 12 },
+            { max: 14, score: 11 }, { max: 18, score: 10 }, { max: 22, score: 9 },
+            { max: 26, score: 8 }, { max: 30, score: 7 }, { max: 34, score: 6 },
+            { max: 38, score: 5 }, { max: 42, score: 4 }, { max: 46, score: 3 },
+            { max: 49, score: 2 }, { max: Infinity, score: 1 }
+        ];
+        
+        const rangesHealthy = [
+            { min: -2, score: 10 }, { min: -4, score: 9 }, { min: -6, score: 8 },
+            { min: -9, score: 7 }, { min: -12, score: 6 }, { min: -15, score: 5 },
+            { min: -18, score: 4 }, { min: -22, score: 3 }, { min: -28, score: 2 },
+            { min: -Infinity, score: 1 }
+        ];
+        
+        const rangesOver = [
+            { min: -2, score: 10 }, { min: -4, score: 9 }, { min: -7, score: 8 },
+            { min: -10, score: 7 }, { min: -13, score: 6 }, { min: -16, score: 5 },
+            { min: -19, score: 4 }, { min: -23, score: 3 }, { min: -30, score: 2 },
+            { min: -Infinity, score: 1 }
+        ];
+        
+        const rangesUnder = [
+            { max: 13, score: 10 }, { max: 12, score: 9 }, { max: 9, score: 8 },
+            { max: 6, score: 7 }, { max: 3, score: 6 }, { max: 0, score: 5 },
+            { max: -2, score: 4 }, { max: -4, score: 3 }, { max: -6, score: 2 },
+            { max: -Infinity, score: 1 }
+        ];
+
+        function getScore(val, ranges, useMin = false) {
+            if (useMin) {
+                for (let r of ranges) {
+                    if (val >= r.min) return r.score;
+                }
+                return 1;
+            }
+            for (let r of ranges) {
+                if (val <= r.max) return r.score;
+            }
+            return 1;
+        }
+
+        function getScoreUnder(val, ranges) {
+            for (let r of ranges) {
+                if (val >= r.max) return r.score;
+            }
+            return 1;
+        }
+
+        function getClass(score, max) {
+            let pct = score / max;
+            if (pct >= 0.85) return 'excellent';
+            if (pct >= 0.7) return 'good';
+            if (pct >= 0.5) return 'fair';
+            return 'poor';
+        }
+
+        function calculate() {
+            let users = parseFloat(document.getElementById('users').value) || 0;
+            let fa = parseFloat(document.getElementById('falseActivity').value) || 0;
+            let hd = parseFloat(document.getElementById('highDuration').value) || 0;
+            let uw = parseFloat(document.getElementById('unprodWebsite').value) || 0;
+            let ua = parseFloat(document.getElementById('unprodApp').value) || 0;
+            let mg = parseFloat(document.getElementById('missingGoal').value) || 0;
+            let hy = parseFloat(document.getElementById('healthy').value) || 0;
+            let ov = parseFloat(document.getElementById('overutilized').value) || 0;
+            let un = parseFloat(document.getElementById('underutilized').value) || 0;
+
+            let faRate = users ? fa / users : 0;
+            let hdRate = users ? hd / users : 0;
+            let uwRate = users ? uw / users : 0;
+            let uaRate = users ? ua / users : 0;
+            let hyAdj = hy - 70;
+            let ovAdj = 8 - ov;
+            let unAdj = 22 - un;
+
+            let s1 = getScore(faRate, ranges14);
+            let s2 = getScore(hdRate, ranges14);
+            let s3 = getScore(uwRate, rangesWeb);
+            let s4 = getScore(uaRate, rangesApp);
+            let s5 = getScore(mg, rangesMissing);
+            let s6 = getScore(hyAdj, rangesHealthy, true);
+            let s7 = getScore(ovAdj, rangesOver, true);
+            let s8 = getScoreUnder(unAdj, rangesUnder);
+
+            document.getElementById('calc-false').textContent = `${fa} ÷ ${users} = ${faRate.toFixed(2)}`;
+            document.getElementById('calc-high').textContent = `${hd} ÷ ${users} = ${hdRate.toFixed(2)}`;
+            document.getElementById('calc-web').textContent = `${uw} ÷ ${users} = ${uwRate.toFixed(2)}`;
+            document.getElementById('calc-app').textContent = `${ua} ÷ ${users} = ${uaRate.toFixed(2)}`;
+            document.getElementById('calc-missing').textContent = `${mg}%`;
+            document.getElementById('calc-healthy').textContent = `${hy} - 70 = ${hyAdj.toFixed(1)}`;
+            document.getElementById('calc-over').textContent = `8 - ${ov} = ${ovAdj.toFixed(1)}`;
+            document.getElementById('calc-under').textContent = `22 - ${un} = ${unAdj.toFixed(1)}`;
+
+            document.getElementById('score-false').textContent = s1;
+            document.getElementById('score-high').textContent = s2;
+            document.getElementById('score-web').textContent = s3;
+            document.getElementById('score-app').textContent = s4;
+            document.getElementById('score-missing').textContent = s5;
+            document.getElementById('score-healthy').textContent = s6;
+            document.getElementById('score-over').textContent = s7;
+            document.getElementById('score-under').textContent = s8;
+
+            ['false', 'high', 'web', 'app', 'missing'].forEach((id, i) => {
+                let s = [s1, s2, s3, s4, s5][i];
+                document.getElementById('res-' + id).className = 'result-item ' + getClass(s, 14);
+            });
+            
+            ['healthy', 'over', 'under'].forEach((id, i) => {
+                let s = [s6, s7, s8][i];
+                document.getElementById('res-' + id).className = 'result-item ' + getClass(s, 10);
+            });
+
+            let total = s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8;
+            document.getElementById('total').textContent = total;
+            
+            let gradeEl = document.getElementById('grade');
+            let totalEl = document.getElementById('total');
+            
+            if (total >= 90) {
+                gradeEl.textContent = 'Excellent';
+                gradeEl.className = 'grade excellent';
+                totalEl.style.background = 'none';
+                totalEl.style.color = '#2ED4B5';
+                totalEl.style.webkitTextFillColor = '#2ED4B5';
+            } else if (total >= 80) {
+                gradeEl.textContent = 'Good';
+                gradeEl.className = 'grade good';
+                totalEl.style.background = 'none';
+                totalEl.style.color = '#5BCF6D';
+                totalEl.style.webkitTextFillColor = '#5BCF6D';
+            } else if (total >= 70) {
+                gradeEl.textContent = 'Fair';
+                gradeEl.className = 'grade fair';
+                totalEl.style.background = 'none';
+                totalEl.style.color = '#FFC83B';
+                totalEl.style.webkitTextFillColor = '#FFC83B';
+            } else {
+                gradeEl.textContent = 'Needs Improvement';
+                gradeEl.className = 'grade poor';
+                totalEl.style.background = 'none';
+                totalEl.style.color = '#ff3263';
+                totalEl.style.webkitTextFillColor = '#ff3263';
+            }
+        }
+    </script>
+</body>
+</html>
