@@ -194,6 +194,26 @@
             font-weight: 600;
         }
         
+        .scores-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        
+        .pdf-section {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .page-break {
+            page-break-before: always;
+            margin-top: 20px;
+        }
+        
         .results-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -429,6 +449,7 @@
                         <input type="number" step="0.1" id="underutilized" placeholder="Percentage">
                     </div>
                 </div>
+                </div>
                 
                 <div class="btn-container">
                     <button class="btn btn-primary" onclick="calculate()">Calculate</button>
@@ -443,8 +464,9 @@
             </div>
             
             <div class="main-content">
-                <div class="section-title">Individual Scores</div>
-                <div class="results-grid">
+                <div class="scores-card" id="scoresCard">
+                    <div class="section-title">Individual Scores</div>
+                    <div class="results-grid">
                     <div class="result-item" id="res-false">
                         <div class="left-section">
                             <input type="checkbox" id="check-false" onchange="updateImprovements()">
@@ -502,7 +524,9 @@
                         <div class="result-score" id="score-under">--</div>
                     </div>
                 </div>
+                </div>
                 
+                <div class="pdf-section" id="pdfSection">
                 <div class="total-section">
                     <div class="total-label"><span id="clientNameDisplay"></span>ActivQ Health Score</div>
                     <div class="total-description">Your ActivQ score provides a comprehensive assessment of workforce productivity health by evaluating several key indicators, helping you identify areas of concern and determine the best course of action for improvement.</div>
@@ -512,6 +536,8 @@
                     </div>
                     <div class="grade" id="grade">--</div>
                 </div>
+                
+                <div class="page-break"></div>
                 
                 <div class="improvements-section">
                     <div class="improvements-title">Main Areas for Improvement</div>
@@ -770,9 +796,14 @@
         }
 
         function downloadPDF() {
-            const element = document.getElementById('resultsPage');
+            const element = document.getElementById('pdfSection');
             const buttons = document.querySelector('.results-page .btn-container');
+            const scoresCard = document.getElementById('scoresCard');
+            const header = document.querySelector('.header');
+            
+            // Hide elements not needed in PDF
             buttons.style.display = 'none';
+            scoresCard.style.display = 'none';
             
             const clientName = document.getElementById('clientName').value || 'ActivQ';
             
@@ -785,11 +816,13 @@
                     useCORS: true,
                     backgroundColor: '#ffffff'
                 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['css', 'legacy'], before: '.page-break' }
             };
             
             html2pdf().set(opt).from(element).save().then(function() {
                 buttons.style.display = 'block';
+                scoresCard.style.display = 'block';
             });
         }
     </script>
