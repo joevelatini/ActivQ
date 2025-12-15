@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ActivQ</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -356,7 +357,7 @@
             
             <div class="btn-container">
                 <button class="btn btn-secondary" onclick="goBack()">Back</button>
-                <button class="btn btn-primary" onclick="window.print()">Save as PDF</button>
+                <button class="btn btn-primary" onclick="downloadPDF()">Download as PDF</button>
             </div>
         </div>
     </div>
@@ -454,22 +455,39 @@
             let ov = parseFloat(document.getElementById('overutilized').value) || 0;
             let un = parseFloat(document.getElementById('underutilized').value) || 0;
 
-            let faRate = users ? fa / users : 0;
-            let hdRate = users ? hd / users : 0;
-            let uwRate = users ? uw / users : 0;
-            let uaRate = users ? ua / users : 0;
-            let hyAdj = hy - 70;
-            let ovAdj = 8 - ov;
-            let unAdj = 22 - un;
+            // Check if all fields are blank
+            let allBlank = !document.getElementById('users').value &&
+                           !document.getElementById('falseActivity').value &&
+                           !document.getElementById('highDuration').value &&
+                           !document.getElementById('unprodWebsite').value &&
+                           !document.getElementById('unprodApp').value &&
+                           !document.getElementById('missingGoal').value &&
+                           !document.getElementById('healthy').value &&
+                           !document.getElementById('overutilized').value &&
+                           !document.getElementById('underutilized').value;
 
-            let s1 = getScore(faRate, ranges14);
-            let s2 = getScore(hdRate, ranges14);
-            let s3 = getScore(uwRate, rangesWeb);
-            let s4 = getScore(uaRate, rangesApp);
-            let s5 = getScore(mg, rangesMissing);
-            let s6 = getScore(hyAdj, rangesHealthy, true);
-            let s7 = getScore(ovAdj, rangesOver, true);
-            let s8 = getScoreUnder(unAdj, rangesUnder);
+            let s1, s2, s3, s4, s5, s6, s7, s8;
+
+            if (allBlank) {
+                s1 = s2 = s3 = s4 = s5 = s6 = s7 = s8 = 0;
+            } else {
+                let faRate = users ? fa / users : 0;
+                let hdRate = users ? hd / users : 0;
+                let uwRate = users ? uw / users : 0;
+                let uaRate = users ? ua / users : 0;
+                let hyAdj = hy - 70;
+                let ovAdj = 8 - ov;
+                let unAdj = 22 - un;
+
+                s1 = getScore(faRate, ranges14);
+                s2 = getScore(hdRate, ranges14);
+                s3 = getScore(uwRate, rangesWeb);
+                s4 = getScore(uaRate, rangesApp);
+                s5 = getScore(mg, rangesMissing);
+                s6 = getScore(hyAdj, rangesHealthy, true);
+                s7 = getScore(ovAdj, rangesOver, true);
+                s8 = getScoreUnder(unAdj, rangesUnder);
+            }
 
             document.getElementById('score-false').textContent = s1;
             document.getElementById('score-high').textContent = s2;
@@ -530,6 +548,24 @@
         function goBack() {
             document.getElementById('inputPage').classList.remove('hidden');
             document.getElementById('resultsPage').classList.remove('active');
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('resultsPage');
+            const buttons = document.querySelector('.results-page .btn-container');
+            buttons.style.display = 'none';
+            
+            const opt = {
+                margin: 10,
+                filename: 'ActivQ_Score.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#1a1a2e' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                buttons.style.display = 'block';
+            });
         }
     </script>
 </body>
