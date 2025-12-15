@@ -319,6 +319,10 @@
             <div class="card">
                 <div class="input-grid">
                     <div class="input-group">
+                        <label>Client Name</label>
+                        <input type="text" id="clientName" placeholder="Enter client name">
+                    </div>
+                    <div class="input-group">
                         <label>Users</label>
                         <input type="number" id="users" placeholder="Enter number of users">
                     </div>
@@ -429,7 +433,7 @@
             </div>
             
             <div class="total-section">
-                <div class="total-label">ActivQ Health Score</div>
+                <div class="total-label"><span id="clientNameDisplay"></span> ActivQ Health Score</div>
                 <div>
                     <span class="total-score" id="total">0</span>
                     <span class="total-max"> / 100</span>
@@ -680,6 +684,10 @@
                 totalEl.style.color = '#ff3263';
                 totalEl.style.webkitTextFillColor = '#ff3263';
             }
+            
+            // Set client name
+            let clientName = document.getElementById('clientName').value || 'Client';
+            document.getElementById('clientNameDisplay').textContent = clientName;
             
             // Reset checkboxes and improvements
             ['false', 'high', 'web', 'app', 'missing', 'healthy', 'over', 'under'].forEach(function(id) {
